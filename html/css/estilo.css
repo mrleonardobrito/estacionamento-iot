@@ -1,0 +1,246 @@
+/* ===== Base ===== */
+/* Paleta e tipografia do DESIGN.md: garagem escura, luz de lanterna vermelha e detalhes quentes. */
+:root {
+  color-scheme: dark;
+  --bg: #0c0d10;          /* Dark Asphalt: fundo */
+  --surface: #16181e;     /* Industrial Concrete: cartões */
+  --surface-2: #1d2028;
+  --line: #262938;        /* Column Charcoal: bordas e linhas */
+  --red: #c53038;         /* Tail-Light Red: ação e destaque */
+  --red-text: #e8646b;    /* vermelho legível em texto pequeno sobre o fundo escuro */
+  --burgundy: #9e2a3b;    /* Deep Burgundy: hover e gradientes */
+  --sand: #dfbf95;        /* Warm Sand: texto de apoio */
+  --stripe: #e1a384;      /* Terracotta Stripe: demarcação e alertas */
+  --floor: #c8c7c3;       /* piso de concreto claro da garagem (fundo das fotos dos carros) */
+  --text: #c3c6cf;
+  --muted: #8a8f9c;
+  --good: #6cc18f;
+  --reflex: rgba(255, 255, 255, .05);
+  --glow: rgba(197, 48, 56, .4);
+  --display: Montserrat, "Arial Black", Arial, sans-serif;
+  --body: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { min-width: 320px; background: radial-gradient(ellipse 90% 420px at 50% -140px, rgba(197, 48, 56, .22), transparent 70%) no-repeat, var(--bg); color: var(--text); font-family: var(--body) }
+h1, h2, h3 { margin: 0; color: #fff; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 3px }
+p { margin: 0; color: var(--text); font-size: 14px; line-height: 1.55 }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent }
+button:focus-visible { outline: 2px solid var(--stripe); outline-offset: 3px }
+button:disabled { cursor: not-allowed }
+img { -webkit-user-drag: none }
+.container { width: 100%; max-width: 1180px; margin: 0 auto; padding-left: 20px; padding-right: 20px }
+.site { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh }
+.page { flex: 1 }
+.accent { color: var(--red) }
+.eyebrow { color: var(--sand); font-family: var(--display); font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase }
+.muted { margin-left: 4px; color: var(--muted) }
+.icon-button { display: grid; flex-shrink: 0; place-items: center; width: 38px; height: 38px; border: 1px solid var(--reflex); border-radius: 50%; background: var(--surface); color: #fff; transition: border-color .2s, box-shadow .2s }
+.icon-button:hover { border-color: rgba(197, 48, 56, .5); box-shadow: 0 0 16px rgba(197, 48, 56, .25) }
+.icon-button svg { width: 18px; height: 18px }
+.primary { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; min-height: 56px; padding: 18px 20px; border: 0; border-radius: 14px; background: linear-gradient(180deg, var(--red), var(--burgundy)); color: #fff; font-family: var(--display); font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; box-shadow: 0 12px 32px -8px var(--glow), inset 0 1px 0 rgba(255, 255, 255, .15); transition: background .2s, box-shadow .2s }
+.primary:hover:not(:disabled) { background: var(--burgundy); box-shadow: 0 14px 40px -6px rgba(197, 48, 56, .55) }
+.primary:disabled { background: var(--surface-2); color: #5d6270; box-shadow: inset 0 0 0 1px var(--line) }
+.primary svg { width: 19px; height: 19px }
+.helper-note { display: flex; gap: 9px; padding: 13px; border: 1px solid var(--reflex); border-radius: 12px; background: var(--surface); color: var(--muted) }
+.helper-note svg { flex-shrink: 0; margin-top: 2px; color: var(--sand) }
+.helper-note p { color: inherit; font-size: 12px; line-height: 1.6 }
+.notice { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 11px 13px; border: 1px solid rgba(225, 163, 132, .25); border-radius: 12px; background: rgba(225, 163, 132, .1); color: var(--stripe); font-size: 12px; line-height: 1.5 }
+.notice button { display: grid; place-items: center; margin-left: auto; padding: 4px; border: 0; background: transparent }
+
+/* ===== Topo ===== */
+.topbar { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: rgba(12, 13, 16, .78); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px) }
+.topbar-inner { display: flex; align-items: center; gap: 10px; height: 64px }
+.wordmark { display: flex; align-items: center; margin-right: auto; color: #fff; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase }
+.brand-mark { display: grid; place-items: center; width: 32px; height: 32px; margin-right: 10px; border-radius: 9px; background: var(--red); box-shadow: 0 0 18px var(--glow); color: #fff; font-size: 17px; letter-spacing: 0 }
+.conn-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 99px; background: var(--surface); color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap }
+.conn-pill i { width: 7px; height: 7px; border-radius: 50%; background: currentColor }
+.conn-pill.online { border-color: rgba(108, 193, 143, .3); color: var(--good) }
+.conn-pill.online i { box-shadow: 0 0 8px currentColor }
+.conn-pill.offline { border-color: rgba(225, 163, 132, .3); color: var(--stripe) }
+.conn-banner { border-top: 1px solid rgba(225, 163, 132, .2); background: rgba(225, 163, 132, .08); color: var(--stripe); font-size: 12px; line-height: 1.5 }
+.conn-banner .container { display: flex; align-items: flex-start; gap: 8px; padding-top: 9px; padding-bottom: 9px }
+.conn-banner svg { flex-shrink: 0; margin-top: 2px }
+
+/* ===== Início ===== */
+.welcome { display: grid; grid-template-areas: "text" "hero" "cta"; align-content: center; padding-top: 32px; padding-bottom: 40px }
+.hero-text { grid-area: text }
+.intro-tag { display: flex; align-items: center; gap: 10px; color: var(--sand); font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: 4px }
+.intro-tag::before { content: ""; width: 24px; height: 3px; background: var(--stripe) }
+.welcome h1 { margin: 18px 0; font-size: clamp(30px, 9vw, 56px); line-height: 1.1; letter-spacing: .06em }
+.welcome h1 span { color: var(--red); text-shadow: 0 0 28px rgba(197, 48, 56, .55) }
+.intro-copy { font-size: 15px; line-height: 1.7 }
+.hero { grid-area: hero; height: 235px; margin: 24px 0 12px }
+.hero-cta { grid-area: cta }
+.welcome-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; margin-bottom: 24px; color: var(--text); font-size: 12px }
+.welcome-features span { display: flex; align-items: center; gap: 6px }
+.welcome-features svg { color: var(--red-text) }
+.demo-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 11px }
+.demo-caption span { color: var(--sand) }
+
+/* Vitrine: a foto (fundo branco) é multiplicada sobre um holofote claro que se apaga na garagem,
+   com o brilho vermelho dos faróis por cima. O filtro deixa o carro na cor de destaque. */
+.showroom { position: relative; isolation: isolate; overflow: hidden; border: 1px solid var(--reflex); border-radius: 24px; background:
+    radial-gradient(ellipse 62% 58% at 50% 54%, #f3eeea 0%, #d9d1cc 42%, rgba(22, 24, 30, 0) 100%),
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(197, 48, 56, .45), transparent 70%),
+    var(--surface) }
+.showroom::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 4px; background: var(--stripe); opacity: .8 }
+.showroom img { width: 100%; height: 100%; padding: 6% 4%; object-fit: contain; mix-blend-mode: multiply; filter: hue-rotate(130deg) saturate(.9) }
+
+/* ===== Estrutura das telas internas ===== */
+.page-head { display: flex; align-items: center; gap: 14px; padding: 24px 0 20px }
+.page-head h1 { margin-top: 6px; font-size: 19px; letter-spacing: 3px }
+.layout { display: flex; flex-direction: column; gap: 18px; padding-bottom: calc(var(--barra, 0px) + 28px) }
+.side { display: flex; flex-direction: column; gap: 16px }
+.action-bar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 8; padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(22, 24, 30, .92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 -10px 30px rgba(0, 0, 0, .5) }
+
+/* ===== Mapa ===== */
+.availability { display: flex; align-items: center; justify-content: space-between; font-size: 13px }
+.availability strong { margin-right: 4px; color: var(--red); font-family: var(--display); font-size: 30px; text-shadow: 0 0 20px rgba(197, 48, 56, .5) }
+.filter-button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase }
+.filter-button.active { border-color: rgba(197, 48, 56, .6); background: rgba(197, 48, 56, .12); color: var(--red-text) }
+.zone-tabs { display: flex; gap: 3px; margin-top: 18px; padding: 4px; border: 1px solid var(--reflex); border-radius: 14px; background: var(--surface) }
+.zone-tabs button { flex: 1; padding: 11px 4px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap }
+.zone-tabs button.selected { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(197, 48, 56, .35) }
+.map-heading { display: flex; justify-content: space-between; margin: 22px 0 13px; color: var(--muted); font-size: 12px }
+.map-scale { color: var(--sand); font-family: var(--display); font-size: 10px; font-weight: 700; letter-spacing: 3px }
+.parking-map { padding: 16px 16px 12px; border: 1px solid var(--reflex); border-radius: 20px; background:
+    linear-gradient(rgba(38, 41, 56, .6) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(38, 41, 56, .6) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--surface) }
+.parking-sector { width: 100%; max-width: 520px; margin: 0 auto }
+.parking-sector + .parking-sector { margin-top: 20px }
+.sector-title { display: flex; align-items: center; gap: 6px; margin-bottom: 9px }
+.sector-title > span { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: #fff; font-size: 12px; font-weight: 700 }
+.sector-title small { color: var(--muted); font-size: 9px; letter-spacing: 2px }
+.sector-title small:last-child { margin-left: auto; color: var(--good); letter-spacing: 0 }
+
+/* Maquete vista de cima: piso claro de garagem com faixas em carvão, pilares com faixa terracota,
+   telhado à esquerda, vagas, pista e calçada na frente. */
+.lot { --faixa: var(--line); display: grid; grid-template-columns: 14px 22px minmax(0, .7fr) repeat(var(--vagas), minmax(0, 1fr)) 10px; grid-template-rows: 14px 132px 48px 20px; overflow: hidden; border: 5px solid var(--line); border-radius: 12px; background: var(--floor); box-shadow: 0 18px 40px rgba(0, 0, 0, .55), 0 0 0 1px var(--reflex) }
+.lot-roof { grid-column: 1; grid-row: 1 / 4; border-right: 4px solid var(--line); background: repeating-linear-gradient(0deg, #2d303c 0 4px, #1c1e26 4px 6px) }
+.lot-wall { grid-column: 2 / -1; grid-row: 1; background: linear-gradient(90deg, rgba(0, 0, 0, .35) 1px, transparent 1px) 0 0 / 34px 100%, linear-gradient(#2d303c 0 9px, var(--stripe) 9px); box-shadow: 0 3px 6px rgba(0, 0, 0, .3); z-index: 1 }
+.lot-end { grid-column: -2; grid-row: 1 / 3; background: #2d303c; box-shadow: -3px 0 6px rgba(0, 0, 0, .25); z-index: 1 }
+.lot-pavers { grid-column: 2; grid-row: 2; border-radius: 0 0 12px 12px; background-color: #3a3d4a; background-image: linear-gradient(transparent calc(100% - 1px), rgba(0, 0, 0, .35) 0), linear-gradient(90deg, transparent calc(100% - 1px), rgba(0, 0, 0, .35) 0); background-size: 8px 5px }
+.lot-hatch { grid-column: 3; grid-row: 2; border-right: 3px solid var(--faixa); background: repeating-linear-gradient(-50deg, transparent 0 9px, rgba(38, 41, 56, .45) 9px 14px) }
+.lot-lane { display: flex; grid-column: 2 / -1; grid-row: 3; align-items: center; justify-content: space-between; padding: 0 12px; border-top: 2px dashed rgba(38, 41, 56, .35); background: #bab9b5; color: #3a3d4a; font-family: var(--display); font-size: 9px; font-weight: 700; letter-spacing: 2px }
+.lot-lane svg { width: 15px; height: 15px }
+.lot-lane span { display: flex; align-items: center; gap: 6px }
+.lot-sidewalk { grid-column: 1 / -1; grid-row: 4; border-top: 3px solid var(--line); background: #2d303c linear-gradient(90deg, rgba(255, 255, 255, .07) 1px, transparent 1px) 0 0 / 28px 100% }
+.parking-slot { position: relative; display: flex; grid-row: 2; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 22px 4px 20px; border: 0; border-right: 3px solid var(--faixa); background: radial-gradient(ellipse 22% 38% at 50% 55%, rgba(38, 41, 56, .07), transparent); color: var(--line); transition: opacity .15s, background .15s, box-shadow .15s }
+.parking-slot::before { content: ""; position: absolute; top: 12px; left: 50%; width: 42%; height: 6px; border-radius: 3px; background: var(--stripe); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); transform: translateX(-50%) }
+.parking-slot.occupied { background: transparent }
+.parking-slot.offline { background: repeating-linear-gradient(45deg, rgba(225, 163, 132, .4) 0 6px, transparent 6px 12px) }
+.parking-slot.is-selected { background: radial-gradient(ellipse 80% 70% at 50% 45%, rgba(197, 48, 56, .85), rgba(158, 42, 59, .7)); box-shadow: inset 0 0 0 3px var(--red), inset 0 0 26px rgba(255, 120, 120, .45), 0 0 24px var(--glow); color: #fff }
+.parking-slot.dimmed { opacity: .35 }
+.slot-id { position: absolute; bottom: 6px; left: 0; right: 0; color: var(--line); font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: 1px }
+.is-selected .slot-id { color: #fff }
+.slot-state { display: flex; flex-direction: column; align-items: center; gap: 4px }
+.slot-state small { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase }
+.slot-state svg { width: 18px; height: 18px }
+.parked-car { width: 62%; max-width: 54px; height: 88px; object-fit: contain; mix-blend-mode: multiply }
+.color-0 { filter: grayscale(1) contrast(1.5) }
+.color-1 { filter: hue-rotate(125deg) saturate(.7) }
+.color-2 { filter: saturate(.6) }
+.color-3 { filter: grayscale(1) brightness(1.5) }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 15px; color: var(--muted); font-size: 11px }
+.legend span { display: flex; align-items: center; gap: 6px }
+.legend i { width: 10px; height: 10px; border-radius: 2px }
+.free-key { background: var(--floor) }
+.occupied-key { background: #555a66 }
+.selected-key { background: var(--red); box-shadow: 0 0 8px var(--glow) }
+.offline-key { background: var(--stripe) }
+.selection-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px }
+.selection-summary strong { display: block; margin-top: 6px; color: #fff; font-size: 15px }
+.selection-caption { padding: 7px 9px; border: 1px solid rgba(197, 48, 56, .3); border-radius: 8px; background: rgba(197, 48, 56, .1); color: var(--red-text); font-size: 11px; white-space: nowrap }
+
+/* ===== Manobra ===== */
+.assist-heading { display: flex; align-items: center; gap: 12px }
+.spot-badge { padding: 16px 12px; border: 1px solid rgba(197, 48, 56, .4); border-radius: 14px; background: rgba(197, 48, 56, .12); box-shadow: 0 0 22px rgba(197, 48, 56, .2); color: var(--red-text); font-family: var(--display); font-size: 20px; font-weight: 800; letter-spacing: 1px }
+.assist-heading h2 { margin-bottom: 6px; font-size: 15px }
+.assist-heading p { color: var(--muted); font-size: 13px }
+.guidance { padding: 20px 16px; border: 1px solid rgba(223, 191, 149, .2); border-radius: 16px; background: rgba(223, 191, 149, .07); color: var(--sand); text-align: center; transition: background .3s, box-shadow .3s }
+.guidance > svg { width: 26px; height: 26px }
+.guidance h2 { margin: 10px 0 8px; color: inherit; font-size: 16px; letter-spacing: 2px }
+.guidance p { color: inherit; font-size: 13px; line-height: 1.6; opacity: .9 }
+.guidance.good { border-color: rgba(108, 193, 143, .3); background: rgba(108, 193, 143, .08); color: var(--good) }
+.guidance.danger { border-color: rgba(197, 48, 56, .5); background: radial-gradient(ellipse at 50% 0%, rgba(197, 48, 56, .35), transparent 70%), rgba(197, 48, 56, .08); box-shadow: 0 0 30px rgba(197, 48, 56, .25); color: var(--red-text) }
+/* Os "faróis" do diagrama mudam de cor com a orientação. */
+.assist-diagram { --farol: rgba(223, 191, 149, .16); padding: 22px 6px; border: 1px solid var(--reflex); border-radius: 20px; background: radial-gradient(ellipse 70% 55% at 50% 0%, var(--farol), transparent 70%), var(--surface); text-align: center; transition: background .3s }
+.assist-diagram.good { --farol: rgba(108, 193, 143, .2) }
+.assist-diagram.danger { --farol: rgba(197, 48, 56, .45) }
+.front-reading small { display: block; margin-bottom: 6px; color: var(--muted); font-family: var(--display); font-size: 9px; font-weight: 700; letter-spacing: 3px }
+.assist-diagram strong { font-family: var(--display); font-size: 24px; letter-spacing: 1px }
+.assist-diagram strong span { font-family: var(--body); font-size: 12px; font-weight: 400; letter-spacing: 0 }
+.front-reading strong { color: var(--sand) }
+.good .front-reading strong { color: var(--good) }
+.danger .front-reading strong { color: var(--red-text); text-shadow: 0 0 18px rgba(197, 48, 56, .6) }
+.car-readings { display: flex; align-items: center; justify-content: space-around; margin: 12px 0 }
+.bay { isolation: isolate; display: block; padding: 8px; border: 2px dashed var(--line); border-radius: 12px; background: var(--floor); box-shadow: 0 0 0 4px var(--surface), 0 0 0 5px rgba(225, 163, 132, .45) }
+.bay img { display: block; width: 95px; height: 174px; object-fit: contain; mix-blend-mode: multiply; filter: hue-rotate(130deg) saturate(.9) }
+.position-caption { color: var(--muted); font-size: 10px }
+.simulation-controls > div { display: flex; gap: 5px; margin-top: 10px }
+.simulation-controls button { flex: 1; padding: 10px 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); font-size: 11px }
+.simulation-controls button.active { border-color: rgba(197, 48, 56, .6); background: rgba(197, 48, 56, .12); color: var(--red-text) }
+
+/* ===== Estacionado ===== */
+.success { max-width: 560px; margin: 0 auto; padding-bottom: calc(var(--barra, 0px) + 28px); text-align: center }
+.success-icon { margin: 8px 0 17px; color: var(--good); filter: drop-shadow(0 0 14px rgba(108, 193, 143, .45)) }
+.success-icon svg { width: 62px; height: 62px }
+.success h2 { margin: 15px 0; font-size: 24px; line-height: 1.3; letter-spacing: 3px }
+.success > p { color: var(--muted); font-size: 13px; line-height: 1.6 }
+.saved-spot { display: flex; align-items: center; gap: 15px; margin-top: 25px; padding: 20px; border: 1px solid rgba(197, 48, 56, .3); border-radius: 17px; background: radial-gradient(circle at 0% 50%, rgba(197, 48, 56, .22), transparent 60%), var(--surface); text-align: left }
+.saved-spot strong { color: var(--red-text); font-family: var(--display); font-size: 28px; font-weight: 800; text-shadow: 0 0 18px rgba(197, 48, 56, .5) }
+.saved-spot span { color: var(--muted); font-size: 12px; line-height: 1.8 }
+.saved-spot svg { margin-left: auto; color: var(--good) }
+.success-car { height: 220px; margin-top: 20px }
+
+/* ===== Sobre ===== */
+.sheet-overlay { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgba(5, 6, 8, .7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px) }
+.sheet-panel { width: 100%; max-height: 85vh; overflow-y: auto; overscroll-behavior: contain; padding: 10px 22px 28px; border: 1px solid var(--reflex); border-radius: 22px 22px 0 0; background: radial-gradient(ellipse 80% 160px at 50% 0%, rgba(197, 48, 56, .18), transparent), var(--surface); box-shadow: 0 -12px 40px rgba(0, 0, 0, .5) }
+.sheet-handle { width: 36px; height: 4px; margin: 6px auto 14px; border-radius: 99px; background: var(--line) }
+.sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px }
+.sheet-head h2 { margin: 0 0 6px; font-size: 15px }
+.sheet-head p { color: var(--muted); font-size: 12px }
+.about { padding: 0 5px 8px }
+.about p { margin-top: 10px; font-size: 14px; line-height: 1.7 }
+.about h3 { margin: 24px 0 0; color: var(--sand); font-size: 11px; letter-spacing: 3px }
+.about .primary { margin-top: 24px }
+
+/* ===== Telas maiores ===== */
+@media (min-width: 600px) {
+  .sheet-overlay { align-items: center; padding: 24px }
+  .sheet-panel { max-width: 520px; padding: 24px 28px 28px; border-radius: 22px; box-shadow: 0 30px 70px rgba(0, 0, 0, .6) }
+  .sheet-handle { display: none }
+}
+@media (min-width: 900px) {
+  .container { padding-left: 32px; padding-right: 32px }
+  .welcome { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "text hero" "cta hero"; column-gap: 56px; padding-top: 48px; padding-bottom: 64px }
+  .hero-text { align-self: end }
+  .hero-cta { align-self: start; max-width: 440px; padding-top: 32px }
+  .hero { height: 440px; margin: 0 }
+  .welcome-features { justify-content: flex-start }
+  .page-head { padding: 40px 0 28px }
+  .page-head h1 { font-size: 26px; letter-spacing: 4px }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: start; gap: 32px; padding-bottom: 72px }
+  .side { position: sticky; top: calc(var(--topo, 64px) + 24px) }
+  .action-bar { position: static; padding: 20px; border: 1px solid var(--reflex); border-radius: 20px; background: var(--surface); box-shadow: 0 20px 50px rgba(0, 0, 0, .45) }
+  .parking-map { padding: 22px 24px 16px }
+  .assist-diagram { padding: 40px 24px }
+  .assist-diagram strong { font-size: 30px }
+  .bay img { width: 144px; height: 264px }
+  .success { padding-bottom: 72px }
+  .success .action-bar { margin-top: 28px }
+}
+@media (max-width: 899px) {
+  /* Na manobra, a coluna lateral se mistura ao conteúdo para a orientação ficar acima do diagrama. */
+  .assist .side { display: contents }
+  .assist-heading { order: 1 }
+  .guidance { order: 2 }
+  .assist-diagram { order: 3 }
+  .simulation-controls { order: 4 }
+  .assist .helper-note { order: 5 }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important }
+}

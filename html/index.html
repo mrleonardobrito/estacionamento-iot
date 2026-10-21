@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0d10">
+<title>vagaí — Estacionamento inteligente</title>
+<link rel="icon" href="data:,">
+<!-- Fontes do DESIGN.md (Montserrat nos títulos, Inter no texto). Carregam sem bloquear a página;
+     sem internet (rede do ESP32) ficam as fontes do sistema definidas em --display e --body. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;800&display=swap" media="print" onload="this.media='all'">
+<!--
+  vagaí — página servida pelo ESP32 do car (esp32/car/car.ino), sem bibliotecas.
+  Visual em css/estilo.css (segue o DESIGN.md); código em módulos de js/, a partir de js/main.js.
+  O ESP32 recebe tudo num arquivo só: esp32/gerar_pagina.py embute o CSS e junta os módulos.
+
+  Modo em js/config.js: em teste, sem conexão com o ESP32, mostra vagas e leituras simuladas
+  com um aviso fixo no topo; em produção, só dados reais. A página do ESP32 sai sempre em produção.
+  Para testar no computador: python3 -m http.server -d html e abra http://localhost:8000
+  (com ?esp=192.168.4.1, lê um ESP32 na rede).
+-->
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<div class="site" id="app"></div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
