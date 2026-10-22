@@ -1,7 +1,6 @@
 // Monta o HTML da tela e atualiza só o que mudou no DOM. Assim as leituras chegam
 // a cada segundo sem perder a rolagem, o foco ou um toque em andamento.
 import { state } from './estado.js';
-import { telaEstacionado } from './telas/estacionado.js';
 import { telaInicial } from './telas/inicial.js';
 import { telaManobra } from './telas/manobra.js';
 import { telaMapa } from './telas/mapa.js';
@@ -9,7 +8,7 @@ import { topo } from './telas/partes.js';
 import { folhaSobre } from './telas/sobre.js';
 
 export const app = document.getElementById('app');
-const TELAS = { welcome: telaInicial, map: telaMapa, assist: telaManobra, parked: telaEstacionado };
+const TELAS = { welcome: telaInicial, map: telaMapa, assist: telaManobra };
 
 export function render(trocouTela) {
   const novo = document.createElement('div');

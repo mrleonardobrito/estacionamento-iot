@@ -1,4 +1,6 @@
 // Manobra assistida: orientação a partir da leitura do sensor da frente.
+import { CONFIG } from '../config.js';
+import { contagem } from '../estacionar.js';
 import { simulando, state } from '../estado.js';
 import { icone } from '../icones.js';
 import { leituraAtual, orientacao, setorDe } from '../regras.js';
@@ -22,9 +24,20 @@ export function telaManobra() {
           <div class="assist-heading"><span class="spot-badge">${state.selected}</span><div><h2>Sua vaga te espera</h2><p>Setor ${setorDe(state.selected)} · Térreo</p></div></div>
           <div class="guidance ${guia.estado}" role="status">${icone('ok')}<h2>${guia.titulo}</h2><p>${guia.mensagem}</p></div>
           ${simulacao}
-          <div class="action-bar"><button class="primary" ${guia.podeConfirmar ? '' : 'disabled'} data-acao="confirmar">${guia.podeConfirmar ? 'Confirmar estacionamento' : 'Ajuste a posição para confirmar'}${icone('ok')}</button></div>
+          <div class="action-bar">${barraContagem()}</div>
           <div class="helper-note">${icone('duvida')}<p>${simulando() ? 'Valores ilustrativos. ' : ''}A orientação depende da posição e calibração dos sensores. Observe sempre o ambiente.</p></div>
         </aside>
       </div>
     </main>`;
+}
+
+// Contagem até a manobra terminar sozinha; fora da área ideal, só explica o que falta.
+function barraContagem() {
+  const c = contagem();
+  const segundos = CONFIG.manobra.segundosIdeal;
+  return `<div class="countdown ${c ? 'running' : ''}">
+      <div><span class="eyebrow">${c ? 'MANTENHA A POSIÇÃO' : 'PARA CONCLUIR'}</span><p>${c ? 'Concluindo a manobra' : `Fique ${segundos} s na posição ideal`}</p></div>
+      <strong>${c ? c.segundos : segundos}<span> s</span></strong>
+      <i style="--passou: ${c ? c.passou.toFixed(3) : 0}"></i>
+    </div>`;
 }

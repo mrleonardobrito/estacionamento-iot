@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera esp32/car/pagina.h a partir dos arquivos de html/.
+"""Gera esp32/central/pagina.h a partir dos arquivos de html/.
 
 O servidor web do ESP32 atende uma conexão por vez, e pedir cada módulo JS
 separado deixaria a página lenta para abrir. Por isso o CSS e os módulos
@@ -10,7 +10,7 @@ A página do ESP32 sai em modo de produção (só dados reais), seja qual for o
 MODO em html/js/config.js. Com --teste, sai em modo de teste (vagas simuladas).
 
 Rode sempre que mudar algo em html/:
-    python3 esp32/gerar_pagina.py
+    uv run esp32/gerar_pagina.py
 """
 import gzip
 import re
@@ -19,7 +19,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 HTML = RAIZ / "html"
-SAIDA = RAIZ / "esp32" / "car" / "pagina.h"
+SAIDA = RAIZ / "esp32" / "central" / "pagina.h"
 MODO = "teste" if "--teste" in sys.argv[1:] else "producao"
 
 ARQUIVOS = [  # (nome no C, arquivo, comprimir com gzip?)

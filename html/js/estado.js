@@ -3,7 +3,7 @@ import { SEM_ESP, TESTE } from './config.js';
 import { VAGAS_SIMULADAS } from './simulacao.js';
 
 export const state = {
-  screen: 'welcome',                          // welcome | map | assist | parked
+  screen: 'welcome',                          // welcome | map | assist
   conexao: SEM_ESP ? 'offline' : 'conectando', // conectando | online | offline
   vagasESP: [],                               // { id, zone, status: free | occupied | offline } vindas do ESP32
   vagasSimuladas: TESTE ? VAGAS_SIMULADAS : [], // só no modo de teste

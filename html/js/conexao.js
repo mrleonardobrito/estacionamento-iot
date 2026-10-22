@@ -1,8 +1,8 @@
-// Comunicação com o ESP32.
-// GET /api/estado (JSON), consultado a cada segundo:
+// Comunicação com a central (ESP32).
+// GET /api/estado?vaga=A01 (JSON), consultado a cada segundo; vaga = a escolhida no mapa, se houver:
 //   {
 //     "vagas":   [ { "id": "A01", "setor": "A", "estado": "livre" | "ocupada" | "sem_sinal" } ],  // setor opcional: 1ª letra do id
-//     "manobra": { "vaga": "A01", "frente": 40.2 }   // cm; null = sem leitura
+//     "manobra": { "vaga": "A01", "frente": 40.2 }   // cm; null = sem leitura. manobra null = sem vaga escolhida ou vaga desconhecida
 //   }
 import { API, CONFIG } from './config.js';
 import { set, state } from './estado.js';
@@ -16,7 +16,8 @@ export async function consultarESP32() {
   const controle = new AbortController();
   const timer = setTimeout(() => controle.abort(), CONFIG.timeoutMs);
   try {
-    const resposta = await fetch(API, { cache: 'no-store', signal: controle.signal });
+    const url = state.selected ? `${API}?vaga=${encodeURIComponent(state.selected)}` : API;
+    const resposta = await fetch(url, { cache: 'no-store', signal: controle.signal });
     if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
     receber(await resposta.json());
     ultimaResposta = Date.now();

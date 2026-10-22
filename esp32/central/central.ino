@@ -1,27 +1,24 @@
 #include <WiFi.h>
+#include <WebServer.h>
+#include <DNSServer.h>
 #include <esp_now.h>
 #include <esp_wifi.h>
+#include "pagina.h"   // gerado de html/ por: uv run esp32/gerar_pagina.py
 
-// Recebe por ESP-NOW o estado de cada car e repassa a tabela inteira para todos eles.
-// Quem serve a página é o car (esp32/car/car.ino).
+// Recebe por ESP-NOW o estado de cada car, cria a rede Wi-Fi do estacionamento
+// e serve a página e a API para o celular do motorista.
 
-const uint8_t  CHANNEL = 1;           // igual ao dos cars
-const uint8_t  MAX_SPOTS = 64;        // capacidade da tabela
+const char*    AP_SSID = "vagai";
+const char*    AP_PASS = "estaciona";   // mínimo de 8 caracteres
+const uint8_t  CHANNEL = 1;             // igual ao dos cars
+const uint8_t  MAX_SPOTS = 64;          // capacidade da tabela
 const uint32_t OFFLINE_MS = 5000;
-const uint32_t STATE_MS = 1000;       // a cada quanto a tabela é repassada
 const uint16_t NO_ECHO = 0xFFFF;
 const uint8_t  PROTO = 2;
 
-enum : uint8_t { MSG_HELLO = 1, MSG_DATA = 2, MSG_STATE = 4 };
-enum : uint8_t { LIVRE = 0, OCUPADA = 1, SEM_SINAL = 2 };
+enum : uint8_t { MSG_HELLO = 1, MSG_DATA = 2 };
 struct __attribute__((packed)) Msg {   // car -> central (idêntica à do car)
   uint8_t type, version; uint16_t seq, dist10; uint8_t occupied; char id[4]; uint8_t mac[6];
-};
-const uint8_t STATE_MAX = 40;          // entradas por pacote (ESP-NOW: até 250 bytes)
-struct __attribute__((packed)) StateEntry { char id[4]; uint8_t estado; };
-struct __attribute__((packed)) StateMsg {   // central -> cars (idêntica à do car)
-  uint8_t type, version, total, offset, count;
-  StateEntry e[STATE_MAX];
 };
 
 struct Spot {
@@ -31,7 +28,9 @@ struct Spot {
 };
 Spot spots[MAX_SPOTS];
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-const uint8_t BCAST[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+WebServer server(80);
+DNSServer dns;
 
 // ---------- Tabela de vagas ----------
 // Chamar dentro da seção crítica.
@@ -63,47 +62,78 @@ void onRecv(const esp_now_recv_info_t*, const uint8_t* data, int len) {
   portEXIT_CRITICAL(&mux);
 }
 
-// ---------- Repasse aos cars ----------
-void broadcastState() {
-  StateEntry all[MAX_SPOTS]; uint8_t n = 0;
+// ---------- Página ----------
+const char* ESTADOS[] = { "livre", "ocupada", "sem_sinal" };
+
+// Formato descrito no topo de html/js/conexao.js. ?vaga=A01 escolhe a vaga da manobra.
+void sendEstado() {
+  Spot list[MAX_SPOTS]; uint8_t n = 0;
   portENTER_CRITICAL(&mux);
   uint32_t now = millis();
   for (auto& s : spots)
-    if (s.used) {
-      memcpy(all[n].id, s.id, 4);
-      all[n++].estado = now - s.lastSeen >= OFFLINE_MS ? SEM_SINAL : s.occupied ? OCUPADA : LIVRE;
-    }
+    if (s.used) list[n++] = s;
   portEXIT_CRITICAL(&mux);
 
-  // Mesmo sem vagas envia um pacote vazio: assim os cars sabem que a central está viva.
-  uint8_t off = 0;
-  do {
-    StateMsg m = { MSG_STATE, PROTO, n, off, (uint8_t)min<int>(n - off, STATE_MAX) };
-    memcpy(m.e, all + off, m.count * sizeof(StateEntry));
-    esp_now_send(BCAST, (uint8_t*)&m, offsetof(StateMsg, e) + m.count * sizeof(StateEntry));
-    off += STATE_MAX;
-    delay(5);
-  } while (off < n);
+  for (int i = 1; i < n; i++) {                      // ordena por id para o mapa ficar A01, A02, ...
+    Spot k = list[i]; int j = i - 1;
+    while (j >= 0 && strncmp(list[j].id, k.id, 4) > 0) { list[j + 1] = list[j]; j--; }
+    list[j + 1] = k;
+  }
+
+  String vaga = server.arg("vaga");
+  const Spot* manobra = nullptr;
+  String j = "{\"vagas\":[";
+  for (uint8_t i = 0; i < n; i++) {
+    bool online = now - list[i].lastSeen < OFFLINE_MS;
+    if (i) j += ',';
+    j += "{\"id\":\""; j += list[i].id; j += "\",\"estado\":\"";
+    j += ESTADOS[!online ? 2 : list[i].occupied ? 1 : 0]; j += "\"}";
+    if (!manobra && vaga.length() && vaga == list[i].id) manobra = &list[i];
+  }
+  j += "],\"manobra\":";
+  if (!manobra) j += "null";
+  else {
+    bool online = now - manobra->lastSeen < OFFLINE_MS;
+    j += "{\"vaga\":\""; j += manobra->id; j += "\",\"frente\":";
+    j += (!online || manobra->dist10 == NO_ECHO) ? String("null") : String(manobra->dist10 / 10.0, 1);
+    j += "}";
+  }
+  j += "}";
+  server.sendHeader("Access-Control-Allow-Origin", "*");  // permite testar a página aberta no PC (?esp=IP)
+  server.sendHeader("Cache-Control", "no-store");
+  server.send(200, "application/json", j);
+}
+
+void sendFile(const char* type, const uint8_t* data, size_t len, bool gzip) {
+  if (gzip) server.sendHeader("Content-Encoding", "gzip");
+  server.sendHeader("Cache-Control", gzip ? "no-cache" : "max-age=86400");
+  server.send_P(200, type, (const char*)data, len);
 }
 
 // ---------- Setup e loop ----------
 void setup() {
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
-  esp_wifi_set_channel(CHANNEL, WIFI_SECOND_CHAN_NONE);
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(AP_SSID, AP_PASS, CHANNEL);          // o AP fixa o rádio no canal do ESP-NOW
+  dns.start(53, "*", WiFi.softAPIP());             // qualquer endereço leva à página
+
   esp_now_init();
-  esp_now_register_recv_cb(onRecv);
-  esp_now_peer_info_t p = {};
-  memcpy(p.peer_addr, BCAST, 6); p.channel = CHANNEL; p.encrypt = false;
-  esp_now_add_peer(&p);
-  Serial.print("Central pronta. MAC "); Serial.println(WiFi.macAddress());
+  esp_now_register_recv_cb(onRecv);                // só recebe: não precisa cadastrar peers
+
+  server.on("/", [] { sendFile("text/html; charset=utf-8", INDEX_HTML_GZ, INDEX_HTML_GZ_LEN, true); });
+  server.on("/car-hero.webp", [] { sendFile("image/webp", CAR_HERO_WEBP, CAR_HERO_WEBP_LEN, false); });
+  server.on("/car-top.webp", [] { sendFile("image/webp", CAR_TOP_WEBP, CAR_TOP_WEBP_LEN, false); });
+  server.on("/api/estado", sendEstado);
+  server.onNotFound([] {
+    server.sendHeader("Location", String("http://") + WiFi.softAPIP().toString() + "/", true);
+    server.send(302, "text/plain", "");
+  });
+  server.begin();
+
+  Serial.printf("Central pronta. Rede \"%s\" criada. Abra http://%s\n", AP_SSID, WiFi.softAPIP().toString().c_str());
 }
 
 void loop() {
-  static uint32_t lastState = 0;
-  if (millis() - lastState >= STATE_MS) {
-    lastState = millis();
-    broadcastState();
-  }
-  delay(10);
+  dns.processNextRequest();
+  server.handleClient();
 }
