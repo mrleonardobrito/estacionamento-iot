@@ -12,7 +12,7 @@ const uint8_t  CHANNEL     = 1;      // mesmo canal da central
 // Mesmos limites da manobra na página (html/js/config.js: idealMaxCm e chegandoMaxCm).
 const uint16_t OCC_ON      = 500;    // <= 50,0 cm (posição ideal) -> ocupada na hora
 const uint16_t OCC_OFF     = 1000;   // > 100,0 cm (saiu da faixa "chegando") -> livre
-const uint32_t DEBOUNCE_MS = 3000;   // tempo seguido acima de OCC_OFF para liberar
+const uint32_t DEBOUNCE_MS = 500;    // tempo seguido acima de OCC_OFF para liberar
 const uint32_t PING_MS     = 70;     // HC-SR04: >= 60 ms entre disparos
 const uint32_t SEND_MS     = 1000;   // envio periódico, mesmo sem mudança
 const uint32_t FAST_MS     = 200;    // envio quando a distância muda (para a manobra)

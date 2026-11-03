@@ -16,7 +16,7 @@ Projeto de IoT do IFAL. Cada vaga tem um ESP32 com sensor ultrassônico que dete
                                                   http://192.168.4.1
 ```
 
-- **car** ([esp32/car/car.ino](esp32/car/car.ino)): um por vaga. Lê o HC-SR04 e define se a vaga está ocupada, com mediana de 5 leituras, histerese (ocupada abaixo de 150 cm, livre acima de 170 cm) e debounce de 3 s. Acende o LED verde ou o vermelho e envia o estado e a distância à central a cada segundo, ou a cada 200 ms enquanto a distância muda (manobra). Quando a vaga muda de estado, envia na hora, 3 vezes, porque o broadcast do ESP-NOW não confirma entrega. Não cria rede.
+- **car** ([esp32/car/car.ino](esp32/car/car.ino)): um por vaga. Lê o HC-SR04 e define se a vaga está ocupada, com mediana de 5 leituras, histerese (ocupada a 50 cm ou menos, livre acima de 100 cm) e debounce de 0,5 s para liberar. Acende o LED verde ou o vermelho e envia o estado e a distância à central a cada segundo, ou a cada 200 ms enquanto a distância muda (manobra). Quando a vaga muda de estado, envia na hora, 3 vezes, porque o broadcast do ESP-NOW não confirma entrega. Não cria rede.
 - **central** ([esp32/central/central.ino](esp32/central/central.ino)): recebe o estado de todos os cars, cria a rede `vagai` e serve a página, a API e o canal de eventos. Uma vaga que fica 5 s sem dar notícia aparece como `sem_sinal`.
 - **página** ([html/](html/)): HTML, CSS e módulos JavaScript puros, sem bibliotecas. O `gerar_pagina.py` junta tudo num único HTML, que fica gravado no firmware da central, comprimido com gzip.
 
@@ -79,7 +79,7 @@ Requisitos: Arduino IDE ou `arduino-cli` com o core **ESP32 3.x**. No core 2.x, 
    `CHANNEL` precisa ser igual no car e na central (padrão: 1).
 3. Conecte o celular na rede `vagai`. A página abre sozinha no portal cativo ou em `http://192.168.4.1`.
 
-Os limites de ocupação (`OCC_ON`, `OCC_OFF`) estão em décimos de cm e devem ser calibrados de acordo com a posição do sensor na maquete. A vaga fica ocupada assim que o carro chega na posição ideal (`OCC_ON`, 50 cm) e só volta a ficar livre depois de 3 s fora da faixa "chegando" (`OCC_OFF`, 100 cm). Mantenha esses valores iguais a `idealMaxCm` e `chegandoMaxCm` em [html/js/config.js](html/js/config.js).
+Os limites de ocupação (`OCC_ON`, `OCC_OFF`) estão em décimos de cm e devem ser calibrados de acordo com a posição do sensor na maquete. A vaga fica ocupada assim que o carro chega na posição ideal (`OCC_ON`, 50 cm) e só volta a ficar livre depois de 0,5 s fora da faixa "chegando" (`OCC_OFF`, 100 cm). Mantenha esses valores iguais a `idealMaxCm` e `chegandoMaxCm` em [html/js/config.js](html/js/config.js).
 
 ## Editando a página
 
