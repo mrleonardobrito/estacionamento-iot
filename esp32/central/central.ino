@@ -14,6 +14,10 @@ const uint8_t  CHANNEL = 1;             // igual ao dos cars
 const uint8_t  MAX_SPOTS = 64;          // capacidade da tabela
 const uint32_t OFFLINE_MS = 5000;
 const uint16_t NO_ECHO = 0xFFFF;
+const uint16_t SSE_PORT = 81;           // eventos para a página (Server-Sent Events)
+const uint8_t  SSE_MAX = 4;             // páginas abertas ao mesmo tempo
+const uint32_t PUSH_MS = 100;           // de quanto em quanto tempo verifica se o estado mudou
+const uint32_t BEAT_MS = 1000;          // reenvia mesmo sem mudança: a página usa como sinal de vida
 const uint8_t  PROTO = 2;
 
 enum : uint8_t { MSG_HELLO = 1, MSG_DATA = 2 };
@@ -31,6 +35,10 @@ portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 WebServer server(80);
 DNSServer dns;
+WiFiServer eventos(SSE_PORT);
+struct Ouvinte { WiFiClient c; String vaga, ultimo; uint32_t lastPush; };
+Ouvinte ouvintes[SSE_MAX];
+volatile bool soltarOuvintes = false;
 
 // ---------- Tabela de vagas ----------
 // Chamar dentro da seção crítica.
@@ -65,8 +73,8 @@ void onRecv(const esp_now_recv_info_t*, const uint8_t* data, int len) {
 // ---------- Página ----------
 const char* ESTADOS[] = { "livre", "ocupada", "sem_sinal" };
 
-// Formato descrito no topo de html/js/conexao.js. ?vaga=A01 escolhe a vaga da manobra.
-void sendEstado() {
+// Formato descrito no topo de html/js/conexao.js. vaga escolhe a vaga da manobra.
+String montarEstado(const String& vaga) {
   Spot list[MAX_SPOTS]; uint8_t n = 0;
   portENTER_CRITICAL(&mux);
   uint32_t now = millis();
@@ -80,7 +88,6 @@ void sendEstado() {
     list[j + 1] = k;
   }
 
-  String vaga = server.arg("vaga");
   const Spot* manobra = nullptr;
   String j = "{\"vagas\":[";
   for (uint8_t i = 0; i < n; i++) {
@@ -99,9 +106,61 @@ void sendEstado() {
     j += "}";
   }
   j += "}";
+  return j;
+}
+
+// GET /api/estado?vaga=A01: usado pela página só enquanto o canal de eventos não está funcionando.
+void sendEstado() {
   server.sendHeader("Access-Control-Allow-Origin", "*");  // permite testar a página aberta no PC (?esp=IP)
   server.sendHeader("Cache-Control", "no-store");
-  server.send(200, "application/json", j);
+  server.send(200, "application/json", montarEstado(server.arg("vaga")));
+}
+
+// ---------- Eventos (porta 81) ----------
+// Cada página mantém uma conexão aberta (GET /eventos?vaga=A01) e recebe o estado assim que
+// ele muda, sem esperar a próxima consulta. Fica fora do WebServer, que atende um cliente por vez.
+String vagaDoPedido(WiFiClient& c) {
+  c.setTimeout(200);
+  String linha = c.readStringUntil('\n');            // "GET /eventos?vaga=A01 HTTP/1.1"
+  int i = linha.indexOf("vaga=");
+  String vaga;
+  if (i >= 0)
+    for (i += 5; i < (int)linha.length() && isalnum((unsigned char)linha[i]) && vaga.length() < 3; i++) vaga += linha[i];
+  return vaga;
+}
+
+void aceitarOuvinte() {
+  WiFiClient c = eventos.accept();
+  if (!c) return;
+  for (auto& o : ouvintes)
+    if (!o.c.connected()) {
+      o.vaga = vagaDoPedido(c);
+      c.setNoDelay(true);  // sem Nagle: cada evento sai na hora
+      c.print("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-store\r\n"
+              "Access-Control-Allow-Origin: *\r\nConnection: keep-alive\r\n\r\nretry: 1000\n\n");
+      o.c = c; o.ultimo = ""; o.lastPush = 0;  // o primeiro estado sai no próximo empurrarEstado()
+      return;
+    }
+  c.stop();  // todas as posições ocupadas: a página continua pela API
+}
+
+void empurrarEstado() {
+  static uint32_t lastCheck = 0;
+  if (soltarOuvintes) {  // um celular saiu da rede: a conexão dele travaria o write
+    soltarOuvintes = false;
+    for (auto& o : ouvintes) o.c.stop();  // as páginas que continuam na rede reconectam em 1 s
+  }
+  uint32_t now = millis();
+  if (now - lastCheck < PUSH_MS) return;
+  lastCheck = now;
+  for (auto& o : ouvintes) {
+    if (!o.c.connected()) continue;
+    String j = montarEstado(o.vaga);
+    if (j == o.ultimo && now - o.lastPush < BEAT_MS) continue;
+    o.ultimo = j; o.lastPush = now;
+    String msg = "data: " + j + "\n\n";
+    if (o.c.write((const uint8_t*)msg.c_str(), msg.length()) != msg.length()) o.c.stop();
+  }
 }
 
 void sendFile(const char* type, const uint8_t* data, size_t len, bool gzip) {
@@ -129,6 +188,9 @@ void setup() {
     server.send(302, "text/plain", "");
   });
   server.begin();
+  eventos.begin();
+  WiFi.onEvent([](arduino_event_id_t, arduino_event_info_t) { soltarOuvintes = true; },
+               ARDUINO_EVENT_WIFI_AP_STADISCONNECTED);
 
   Serial.printf("Central pronta. Rede \"%s\" criada. Abra http://%s\n", AP_SSID, WiFi.softAPIP().toString().c_str());
 }
@@ -136,4 +198,6 @@ void setup() {
 void loop() {
   dns.processNextRequest();
   server.handleClient();
+  aceitarOuvinte();
+  empurrarEstado();
 }

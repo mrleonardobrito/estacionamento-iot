@@ -114,8 +114,11 @@ void loop() {
     digitalWrite(PIN_LED_R, occupied);
     digitalWrite(PIN_LED_G, !occupied);
   }
-  if (changed || now - lastSend >= SEND_MS || (now - lastSend >= FAST_MS && distMoved())) {
-    sendMsg(MSG_DATA); lastSend = now; sentDist = dist; changed = false;
+  if (changed) {  // broadcast do ESP-NOW não tem confirmação: repete a mudança para não depender do envio de 1 s
+    for (int k = 0; k < 3; k++) { sendMsg(MSG_DATA); delay(3); }
+    lastSend = now; sentDist = dist; changed = false;
+  } else if (now - lastSend >= SEND_MS || (now - lastSend >= FAST_MS && distMoved())) {
+    sendMsg(MSG_DATA); lastSend = now; sentDist = dist;
   }
   if (now - lastHello >= 30000) { sendMsg(MSG_HELLO); lastHello = now; }
 }

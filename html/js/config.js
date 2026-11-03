@@ -8,8 +8,9 @@ const MODO = 'producao';
 export const TESTE = MODO === 'teste';
 
 export const CONFIG = {
-  intervaloMs: 1000,          // consulta ao ESP32 no mapa e nas outras telas
-  intervaloManobraMs: 400,    // consulta mais rápida durante a manobra
+  intervaloMs: 1000,          // consulta à API no mapa e nas outras telas (só sem o canal de eventos)
+  intervaloManobraMs: 400,    // consulta mais rápida durante a manobra (idem)
+  eventoValidoMs: 2500,       // sem evento por esse tempo, volta a consultar a API (a central manda um por segundo)
   timeoutMs: 2500,            // tempo máximo de espera por uma resposta
   semRespostaMs: 5000,        // depois de conectado, sem resposta por esse tempo = "sem conexão"
   manobra: {                  // limites da manobra assistida (calibre com a maquete; os dois últimos
@@ -24,5 +25,6 @@ export const CONFIG = {
 const params = new URLSearchParams(location.search);
 const ESP = params.get('esp');
 export const API = (ESP ? `http://${ESP}` : '') + '/api/estado';
+export const EVENTOS = `http://${ESP || location.hostname}:81/eventos`;  // a central empurra o estado por aqui
 // Teste aberto do computador (arquivo ou servidor local) sem ?esp=: não há ESP32 para consultar.
 export const SEM_ESP = TESTE && !ESP && (location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname));

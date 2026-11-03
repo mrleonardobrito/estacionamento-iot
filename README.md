@@ -16,8 +16,8 @@ Projeto de IoT do IFAL. Cada vaga tem um ESP32 com sensor ultrassônico que dete
                                                   http://192.168.4.1
 ```
 
-- **car** ([esp32/car/car.ino](esp32/car/car.ino)): um por vaga. Lê o HC-SR04 e define se a vaga está ocupada, com mediana de 5 leituras, histerese (ocupada abaixo de 150 cm, livre acima de 170 cm) e debounce de 3 s. Acende o LED verde ou o vermelho e envia o estado e a distância à central a cada segundo, ou a cada 200 ms enquanto a distância muda (manobra). Não cria rede.
-- **central** ([esp32/central/central.ino](esp32/central/central.ino)): recebe o estado de todos os cars, cria a rede `vagai` e serve a página e a API. Uma vaga que fica 5 s sem dar notícia aparece como `sem_sinal`.
+- **car** ([esp32/car/car.ino](esp32/car/car.ino)): um por vaga. Lê o HC-SR04 e define se a vaga está ocupada, com mediana de 5 leituras, histerese (ocupada abaixo de 150 cm, livre acima de 170 cm) e debounce de 3 s. Acende o LED verde ou o vermelho e envia o estado e a distância à central a cada segundo, ou a cada 200 ms enquanto a distância muda (manobra). Quando a vaga muda de estado, envia na hora, 3 vezes, porque o broadcast do ESP-NOW não confirma entrega. Não cria rede.
+- **central** ([esp32/central/central.ino](esp32/central/central.ino)): recebe o estado de todos os cars, cria a rede `vagai` e serve a página, a API e o canal de eventos. Uma vaga que fica 5 s sem dar notícia aparece como `sem_sinal`.
 - **página** ([html/](html/)): HTML, CSS e módulos JavaScript puros, sem bibliotecas. O `gerar_pagina.py` junta tudo num único HTML, que fica gravado no firmware da central, comprimido com gzip.
 
 ## Estrutura
@@ -30,7 +30,7 @@ html/
     main.js             ponto de entrada: cliques, primeira tela e consulta ao ESP32
     config.js           CONFIG (intervalos, limites da manobra) e endereço da API
     estado.js           estado da página e set()
-    conexao.js          consulta ao GET /api/estado
+    conexao.js          eventos da porta 81 e, sem eles, consulta ao GET /api/estado
     regras.js           setor da vaga e orientação da manobra
     estacionar.js       contagem na posição ideal que termina a manobra sozinha
     acoes.js            o que cada botão (data-acao) faz
@@ -135,7 +135,11 @@ Os intervalos de consulta e os limites da manobra ficam no objeto `CONFIG`, em [
 
 ## API
 
-`GET /api/estado?vaga=A01`, servida pela central e consultada pela página a cada 1 s (a cada 400 ms durante a manobra):
+A central entrega o estado de duas formas, com o mesmo JSON. `vaga` é a vaga escolhida no mapa e define a leitura de `manobra`:
+
+- **Eventos (principal):** `http://<central>:81/eventos?vaga=A01`, em Server-Sent Events. A página mantém a conexão aberta (e a reabre quando a vaga escolhida muda), e a central envia o estado assim que ele muda (verifica a cada 100 ms) e pelo menos uma vez por segundo. Até 4 páginas ao mesmo tempo.
+- **`GET /api/estado?vaga=A01` (reserva):** a página só consulta quando não recebe eventos há 2,5 s, a cada 1 s (a cada 400 ms durante a manobra).
+
 
 ```json
 {
