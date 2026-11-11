@@ -42,9 +42,10 @@ html/
   car-top.webp
 esp32/
   car/car.ino           firmware do nó de vaga
+  car/limites.h         limites de distância copiados de html/js/config.js (gerado, não editar)
   central/central.ino   firmware da central (rede, página e API)
   central/pagina.h      página e imagens embutidas (gerado, não editar)
-  gerar_pagina.py       gera central/pagina.h a partir de html/
+  gerar_pagina.py       gera central/pagina.h e car/limites.h a partir de html/
 DESIGN.md               paleta, tipografia e efeitos visuais
 reference/              imagens de referência do design
 pyproject.toml          projeto Python do uv (versão do Python; sem dependências)
@@ -94,6 +95,8 @@ Depois de alterar qualquer arquivo em `html/`, gere de novo o cabeçalho embutid
 ```sh
 uv run esp32/gerar_pagina.py
 ```
+
+O script também grava `esp32/car/limites.h` com o `pareCm` e o `chegandoMaxCm` do `config.js` (em décimos de cm), para a vaga usar os mesmos limites da página. Se mudar esses valores, grave também as vagas.
 
 O servidor web do ESP32 atende uma conexão por vez, então o script entrega a página num arquivo só: embute o `css/estilo.css` no `index.html`, junta os módulos de `js/` (a partir do `main.js`), comprime com gzip e grava tudo como arrays `PROGMEM` em `esp32/central/pagina.h`. As imagens continuam em arquivos separados.
 

@@ -35,8 +35,7 @@ function mapa(lista, livres) {
     return `<section class="parking-sector" aria-label="Setor ${z}">
         ${variosSetores ? `<div class="sector-title"><span>${z}</span><small>SETOR ${z}</small><small>${livresNoSetor} ${livresNoSetor === 1 ? 'livre' : 'livres'}</small></div>` : ''}
         <div class="lot" style="--vagas: ${doSetor.length}">
-          <div class="lot-roof"></div><div class="lot-wall"></div><div class="lot-end"></div>
-          <div class="lot-pavers"></div><div class="lot-hatch"></div>
+          <div class="lot-wall"></div><div class="lot-end"></div>
           ${doSetor.map(botaoVaga).join('')}
           <div class="lot-lane"><span>${icone('seta')} ENTRADA</span><span>SAÍDA ${icone('seta')}</span></div>
           <div class="lot-sidewalk"></div>

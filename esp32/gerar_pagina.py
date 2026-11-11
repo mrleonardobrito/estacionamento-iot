@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Gera esp32/central/pagina.h a partir dos arquivos de html/.
 
+Também gera esp32/car/limites.h com os limites de distância da manobra
+(pareCm e chegandoMaxCm de html/js/config.js), para a vaga usar os mesmos
+valores da página. A fonte única desses limites é o config.js.
+
 O servidor web do ESP32 atende uma conexão por vez, e pedir cada módulo JS
 separado deixaria a página lenta para abrir. Por isso o CSS e os módulos
 (a partir de js/main.js) são embutidos no index.html antes de comprimir.
@@ -20,6 +24,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 HTML = RAIZ / "html"
 SAIDA = RAIZ / "esp32" / "central" / "pagina.h"
+LIMITES = RAIZ / "esp32" / "car" / "limites.h"
 MODO = "teste" if "--teste" in sys.argv[1:] else "producao"
 
 ARQUIVOS = [  # (nome no C, arquivo, comprimir com gzip?)
@@ -107,3 +112,25 @@ for nome, caminho, comprimir in ARQUIVOS:
 
 SAIDA.write_text("\n".join(linhas), encoding="utf-8")
 print(f"{SAIDA.relative_to(RAIZ)} gerado (modo {MODO})")
+
+
+def limite_cm(js, nome):
+    """Lê `nome: <número>` de js/config.js e devolve em décimos de cm (unidade do car.ino)."""
+    achados = re.findall(rf"^\s*{nome}:\s*([\d.]+)\s*,", js, re.MULTILINE)
+    if len(achados) != 1:
+        sys.exit(f"js/config.js: declare {nome} uma vez, numa linha só, como {nome}: 12,")
+    return round(float(achados[0]) * 10)
+
+
+config = (HTML / "js" / "config.js").read_text(encoding="utf-8")
+LIMITES.write_text("\n".join([
+    "// Gerado por esp32/gerar_pagina.py a partir de html/js/config.js. Não edite à mão.",
+    "// Distâncias em décimos de cm.",
+    "#pragma once",
+    "#include <stdint.h>",
+    "",
+    f"const uint16_t STOP_AT = {limite_cm(config, 'pareCm')};   // pareCm: \"Pare\"",
+    f"const uint16_t OCC_ON  = {limite_cm(config, 'chegandoMaxCm')};  // chegandoMaxCm: entrou na faixa \"chegando\"",
+    "",
+]), encoding="utf-8")
+print(f"{LIMITES.relative_to(RAIZ)} gerado")

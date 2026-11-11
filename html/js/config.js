@@ -13,12 +13,12 @@ export const CONFIG = {
   eventoValidoMs: 2500,       // sem evento por esse tempo, volta a consultar a API (a central manda um por segundo)
   timeoutMs: 2500,            // tempo máximo de espera por uma resposta
   semRespostaMs: 5000,        // depois de conectado, sem resposta por esse tempo = "sem conexão"
-  manobra: {                  // limites da manobra assistida (calibre com a maquete; os dois últimos
-                              // são também OCC_ON e OCC_OFF em esp32/car/car.ino)
-    pareCm: 20,               // frente menor ou igual a isto: "Pare"
-    idealMaxCm: 50,           // frente até isto (e acima de pareCm): "Posição ideal"
-    chegandoMaxCm: 100,       // frente até isto (e acima de idealMaxCm): "Avance devagar"; acima: "Siga até a vaga"
-    segundosIdeal: 5,         // tempo seguido na posição ideal para a manobra terminar sozinha
+  manobra: {                  // limites da manobra assistida (calibre com a maquete). pareCm e chegandoMaxCm
+                              // também valem na vaga: o gerar_pagina.py os copia para esp32/car/limites.h
+    pareCm: 3,               // frente menor ou igual a isto: "Pare"
+    idealMaxCm: 6,           // frente até isto (e acima de pareCm): "Posição ideal"
+    chegandoMaxCm: 12,       // frente até isto (e acima de idealMaxCm): "Avance devagar"; acima: "Siga até a vaga"
+    segundosIdeal: 0.5,         // tempo seguido na posição ideal para a manobra terminar sozinha
   },
 };
 
